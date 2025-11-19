@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 
 
 public interface QuestionRepository extends ReactiveMongoRepository<Question, String> {
@@ -15,6 +16,10 @@ public interface QuestionRepository extends ReactiveMongoRepository<Question, St
     Mono<Long> countByAuthorId(String authorId);
 
 
-    @Query("{'$or' :  [{'title' :  {$regex:  ?0 , $option :  'i'}} , {'content' :   {$regex:  ?0 , $option :  'i'}}]}")
+    @Query("{'$or' :  [{'title' :  {$regex:  ?0 , $options :  'i'}} , {'content' :   {$regex:  ?0 , $options :  'i'}}]}")
     Flux<Question>findByTitleOrContentContainingIgnoreCase(String  searchTerm, Pageable pageable);
+
+    Flux<Question>findByCreatedAtGreaterThanOrderByCreatedAtAsc(LocalDateTime cursor , Pageable pageable );
+
+    Flux<Question>findTop10ByOrderByCreatedAtAsc();
 }

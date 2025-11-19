@@ -35,7 +35,7 @@ public class Question {
     private String authorId ;
 
     @CreatedDate
-    private LocalDateTime cratedAt ;
+    private LocalDateTime createdAt ;
 
     @LastModifiedDate
     private LocalDateTime updatedAt ;
