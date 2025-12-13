@@ -1,6 +1,5 @@
 package org.quoraapp.quoraapp.model;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -18,24 +18,21 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "questions")
-public class Question {
+@Document(collection = "answers")
+public class Answer {
 
     @Id
     private String id;
 
-    @NotBlank(message = "Title is required")
-    @Size(min = 10, max = 100 , message = "A title must be between 10 to 100 character")
-    private String title ;
-
-    @NotBlank(message = "Title is required")
-    @Size(min = 10, max = 100 , message = "A title must be between 10 to 100 character")
+    @Size(min = 1, max = 100)
+    @NotBlank(message = "content is requires")
     private String content ;
 
-    private String authorId ;
-    private Integer views ;
+    @Indexed
+    private String questionId ;
 
     @CreatedDate
+    @Indexed
     private LocalDateTime createdAt ;
 
     @LastModifiedDate
