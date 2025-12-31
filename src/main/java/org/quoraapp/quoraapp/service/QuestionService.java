@@ -3,8 +3,10 @@ package org.quoraapp.quoraapp.service;
 import lombok.RequiredArgsConstructor;
 import org.quoraapp.quoraapp.dto.QuestionRequestDTO;
 import org.quoraapp.quoraapp.dto.QuestionResponseDTO;
+import org.quoraapp.quoraapp.events.ViewCountEvent;
 import org.quoraapp.quoraapp.mapper.QuestionMapper;
 import org.quoraapp.quoraapp.model.Question;
+import org.quoraapp.quoraapp.producers.KafkaEventProducer;
 import org.quoraapp.quoraapp.repository.QuestionRepository;
 import org.quoraapp.quoraapp.utils.CursorUtils;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 public class QuestionService implements IQuestionService {
 
     private final QuestionRepository questionRepository;
+    private final KafkaEventProducer kafkaEventProducer;
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO){
 
@@ -77,5 +80,18 @@ public class QuestionService implements IQuestionService {
 
 
         }
+    }
+    @Override
+    public Mono<QuestionResponseDTO> getQuestionById(String id) {
+        return questionRepository.findById(id)
+                .map(QuestionMapper::toQuestionResponseDTO)
+                .doOnError(error -> System.out.println("Error searching question: " + id))
+                .doOnSuccess(response -> {
+                    System.out.println("Found question: " + id);
+                    ViewCountEvent viewCountEvent = new ViewCountEvent(id, "question" , LocalDateTime.now());
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent) ;
+
+
+                }) ;
     }
 }
