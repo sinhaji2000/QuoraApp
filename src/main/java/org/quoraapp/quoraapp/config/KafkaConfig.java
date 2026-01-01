@@ -22,7 +22,7 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers:localhost:3000}")
+    @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootStrapServer ;
 
     @Value("${spring.kafka.consumer.group-id:view-count-consumer}")
@@ -38,6 +38,7 @@ public class KafkaConfig {
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class) ;
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class) ;
 
+
         return new DefaultKafkaProducerFactory<>(configProps) ;
     }
 
@@ -50,6 +51,7 @@ public class KafkaConfig {
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId) ;
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class) ;
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class) ;
+        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*") ;
 
         return new DefaultKafkaConsumerFactory<>(configProps) ;
     }

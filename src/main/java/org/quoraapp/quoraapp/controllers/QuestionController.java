@@ -37,5 +37,9 @@ public class QuestionController {
         return questionService.getAllQuestions(cursor , size) ;
 
     }
+    @GetMapping("/{id}")
+    public Mono<QuestionResponseDTO> getQuestionById(@PathVariable  String id){
+        return questionService.getQuestionById(id);
+    }
 
 }

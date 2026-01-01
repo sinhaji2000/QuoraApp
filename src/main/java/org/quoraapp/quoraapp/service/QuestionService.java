@@ -11,7 +11,9 @@ import org.quoraapp.quoraapp.repository.QuestionRepository;
 import org.quoraapp.quoraapp.utils.CursorUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -84,14 +86,22 @@ public class QuestionService implements IQuestionService {
     @Override
     public Mono<QuestionResponseDTO> getQuestionById(String id) {
         return questionRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Question not found with id: " + id
+                )))
                 .map(QuestionMapper::toQuestionResponseDTO)
-                .doOnError(error -> System.out.println("Error searching question: " + id))
                 .doOnSuccess(response -> {
                     System.out.println("Found question: " + id);
-                    ViewCountEvent viewCountEvent = new ViewCountEvent(id, "question" , LocalDateTime.now());
-                    kafkaEventProducer.publishViewCountEvent(viewCountEvent) ;
-
-
-                }) ;
+                    ViewCountEvent viewCountEvent = new ViewCountEvent(
+                            id,
+                            "question",
+                            LocalDateTime.now()
+                    );
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                })
+                .doOnError(error ->
+                        System.out.println("Error searching question: " + id + " - " + error.getMessage())
+                );
     }
 }
