@@ -1,6 +1,6 @@
 package org.quoraapp.quoraapp.service;
 
-import lombok.AllArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
 import org.quoraapp.quoraapp.dto.AnswerRequestDTO;
 import org.quoraapp.quoraapp.dto.AnswerResponseDTO;
@@ -21,6 +21,7 @@ public class AnswerService implements IAnswerService {
 
     private final AnswerRepository answerRepository;
 
+    @Override
     public Mono<AnswerResponseDTO> createAnswer(AnswerRequestDTO answerRequestDTO) {
 
        Answer answer = Answer.builder()
@@ -38,6 +39,7 @@ public class AnswerService implements IAnswerService {
 
     }
 
+    @Override
     public Mono<AnswerResponseDTO>getAnswerById(String id){
 
         return answerRepository.findById(id)
@@ -50,4 +52,28 @@ public class AnswerService implements IAnswerService {
                 .doOnError(error -> System.out.println("Error while saving answer: " + error.getMessage()));
 
     }
+
+
+    public Mono<AnswerResponseDTO>updateAnswer(String id, AnswerRequestDTO answerRequestDTO) {
+
+        return answerRepository.findById(id)
+                .flatMap(existingAnswer -> {
+                    existingAnswer.setContent(answerRequestDTO.getContent());
+                    return answerRepository.save(existingAnswer) ;
+                })
+                .map(AnswerMapper :: toAnswerResponseDTO)
+                .doOnSuccess(response -> System.out.println("update Answer"))
+                .doOnError(err -> System.out.println(err)) ;
+    }
+
+    public Mono<AnswerResponseDTO> deleteAnswer(String id) {
+        return answerRepository.findById(id)
+                .switchIfEmpty(Mono.error(new RuntimeException("Answer not found")))
+                .flatMap(answer ->
+                        answerRepository.deleteById(id)
+                                .thenReturn(answer)  // Keep the answer to map to DTO
+                )
+                .map(AnswerMapper::toAnswerResponseDTO);
+    }
+
 }

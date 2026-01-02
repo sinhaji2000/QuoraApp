@@ -35,6 +35,21 @@ public class AnswerController {
 
     }
 
+    @PostMapping("update/{id}")
+    public Mono<AnswerResponseDTO>updateAnswer(@PathVariable String id , @RequestBody AnswerRequestDTO answerRequestDTO){
+
+        return answerService.updateAnswer(id ,  answerRequestDTO)
+                .doOnSuccess(respnse -> System.out.println("update answer succesfully"))
+                .doOnError(err -> System.out.println(err)) ;
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<AnswerResponseDTO>deleteAnswer(@PathVariable String id){
+        return answerService.deleteAnswer(id)
+                .doOnSuccess(respnse -> System.out.println("delete answer succesfully"))
+                .doOnError(err -> System.out.println(err)) ;
+    }
+
 }
 
 
