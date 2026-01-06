@@ -6,7 +6,9 @@ import org.quoraapp.quoraapp.dto.QuestionResponseDTO;
 import org.quoraapp.quoraapp.events.ViewCountEvent;
 import org.quoraapp.quoraapp.mapper.QuestionMapper;
 import org.quoraapp.quoraapp.model.Question;
+import org.quoraapp.quoraapp.model.QuestionElasticDocument;
 import org.quoraapp.quoraapp.producers.KafkaEventProducer;
+import org.quoraapp.quoraapp.repository.QuestionDocumentRepository;
 import org.quoraapp.quoraapp.repository.QuestionRepository;
 import org.quoraapp.quoraapp.utils.CursorUtils;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,8 @@ public class QuestionService implements IQuestionService {
 
     private final QuestionRepository questionRepository;
     private final KafkaEventProducer kafkaEventProducer;
+    private final IQuestionIndexService questionIndexService;
+    private final QuestionDocumentRepository questionDocumentRepository;
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO){
 
@@ -36,7 +41,10 @@ public class QuestionService implements IQuestionService {
                 .build();
 
         return questionRepository.save(question)
-                .map(QuestionMapper ::toQuestionResponseDTO)
+                .map(savedQuestion -> {
+                    questionIndexService.createQuestionIndex(savedQuestion); // dumping questionb to Elastic search
+                    return QuestionMapper.toQuestionResponseDTO(savedQuestion);
+                })
                 .doOnSuccess(response -> System.out.println("Created question: " + question))
                 .doOnError(error -> System.out.println("Error creating question: " + question));
 
@@ -103,5 +111,11 @@ public class QuestionService implements IQuestionService {
                 .doOnError(error ->
                         System.out.println("Error searching question: " + id + " - " + error.getMessage())
                 );
+    }
+
+    @Override
+    public List<QuestionElasticDocument> searchQuestionByElasticSearch(String query){
+
+        return questionDocumentRepository.findByTitleContainingOrContentContaining(query , query) ;
     }
 }

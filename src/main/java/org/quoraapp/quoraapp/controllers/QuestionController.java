@@ -4,11 +4,14 @@ package org.quoraapp.quoraapp.controllers;
 import lombok.RequiredArgsConstructor;
 import org.quoraapp.quoraapp.dto.QuestionRequestDTO;
 import org.quoraapp.quoraapp.dto.QuestionResponseDTO;
+import org.quoraapp.quoraapp.model.QuestionElasticDocument;
 import org.quoraapp.quoraapp.service.IQuestionService;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,6 +43,12 @@ public class QuestionController {
     @GetMapping("/{id}")
     public Mono<QuestionResponseDTO> getQuestionById(@PathVariable  String id){
         return questionService.getQuestionById(id);
+    }
+
+    @GetMapping("/elasticsearch")
+    public List<QuestionElasticDocument> searchQuestionByElasticSearch(@RequestParam String query){
+
+        return questionService.searchQuestionByElasticSearch(query);
     }
 
 }
