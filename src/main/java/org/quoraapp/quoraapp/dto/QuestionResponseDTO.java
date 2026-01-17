@@ -16,6 +16,7 @@ public class QuestionResponseDTO {
 
 
     private String id;
+    private String userId ;
     private String title ;
     private String content ;
     private LocalDateTime createdAt ;

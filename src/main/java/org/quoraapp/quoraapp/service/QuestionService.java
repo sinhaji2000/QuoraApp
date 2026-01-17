@@ -33,8 +33,12 @@ public class QuestionService implements IQuestionService {
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO){
 
+
+
         Question question = Question.builder()
+                .userId(questionRequestDTO.getUserId())
                 .title(questionRequestDTO.getTitle())
+
                 .content(questionRequestDTO.getContent())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

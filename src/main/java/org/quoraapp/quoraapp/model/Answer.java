@@ -24,6 +24,9 @@ public class Answer {
     @Id
     private String id;
 
+    @NotBlank
+    private String userId;
+
     @Size(min = 1, max = 100)
     @NotBlank(message = "content is requires")
     private String content ;

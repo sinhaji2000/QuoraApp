@@ -12,6 +12,10 @@ spring :
       database : quora_db
       auto-index-creation: true
 
+redis:
+  host: localhost
+  port: 6379
+
 
 server:
   port : 3000
@@ -19,3 +23,5 @@ server:
 
 elasticsearch:
   uris : http://localhost:9200
+
+
