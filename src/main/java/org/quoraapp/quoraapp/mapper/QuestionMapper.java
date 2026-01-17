@@ -13,9 +13,9 @@ public class QuestionMapper {
 
         return QuestionResponseDTO.builder()
                 .id(question.getId())
-                .userId(question.getUserId())
                 .title(question.getTitle())
                 .content(question.getContent())
+                .authorId(question.getAuthorId())
                 .createdAt(question.getCreatedAt())
                 .build();
 

@@ -24,8 +24,8 @@ public class Question {
     @Id
     private String id;
 
-    @NotBlank(message = "Unauthorised User")
-    private String userId ;
+
+
 
     @NotBlank(message = "Title is required")
     @Size(min = 10, max = 100 , message = "A title must be between 10 to 100 character")
@@ -35,7 +35,9 @@ public class Question {
     @Size(min = 10, max = 100 , message = "A title must be between 10 to 100 character")
     private String content ;
 
+    @NotBlank(message = "Unauthorised User")
     private String authorId ;
+
     private Integer views ;
 
     @CreatedDate
