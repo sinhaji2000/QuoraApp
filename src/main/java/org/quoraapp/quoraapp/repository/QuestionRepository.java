@@ -9,6 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface QuestionRepository extends ReactiveMongoRepository<Question, String> {
@@ -23,4 +24,9 @@ public interface QuestionRepository extends ReactiveMongoRepository<Question, St
     Flux<Question>findByCreatedAtGreaterThanOrderByCreatedAtAsc(LocalDateTime cursor , Pageable pageable );
 
     Flux<Question>findTop10ByOrderByCreatedAtAsc();
+//    Flux<Question>findFeedForUser(String userId, int page, int size);
+    @Query("{ 'authorId': { $in: ?0 } }")
+    Flux<Question> findFeedForUser(List<String> userIds, Pageable pageable);
+
+
 }
